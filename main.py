@@ -7,9 +7,9 @@ import pprint
 from pathlib import Path
 from constants import *
 
+# User home directory
 HOME = str(Path.home()) + "/"
 
-  
 def help():
   # to do
   print("help")
@@ -23,7 +23,8 @@ def launch():
   subprocess.run(["ls", "-1"])
   input()
 
-
+# Prints a main menu and launches functions associated
+# with the commands that a user enters.
 def menu():
   userin = ""
   num_commands = len(COMMANDS) - 1
@@ -45,14 +46,17 @@ def menu():
         print(userin + ":", BAD_C)
         subprocess.run(CLEAR_C)
     
-    
+
+# Handle ^C
 def sig_handler(signum, frame):
   sigint = 2
   if signum == sigint:
     print("\n", EXIT)
     exit(sigint)  
 
-# Download the latest jar from mojang
+# Download a json file from mojang that contains urls
+# to all of the different server versions. Downloads the
+# latest version.
 def download_jar(path):
   mc_versions = json.loads(requests.get(VERSIONS_URL).text)
   latest = mc_versions["latest"]["release"]
@@ -96,7 +100,7 @@ def check_dir():
 def main():
   signal.signal(signal.SIGINT, sig_handler)
   check_dir()
-  # menu()
+  menu()
 
 if __name__ == "__main__":
   main()
