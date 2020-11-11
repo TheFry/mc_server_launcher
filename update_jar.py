@@ -69,20 +69,24 @@ def get_download_info(build: dict) -> dict:
 # Runs through all of the above functions to download a jar file.
 # Version and type (server/client) can be specified. Use this if you
 # want to just download a jar and don't care about the json data.
-def download_jar(id: str = "latest", mode: str = S_TYPE) -> bytes:
+def download_jar(d_path: PATH, id: str = "latest", mode: str = S_TYPE) -> int:
   info: dict = None
-  data: bytes = None
-  request: requests.models.Response = None
+  response: requests.models.Response = None
   
   info = get_download_info(get_build_info(get_builds(), id))
-  if info == None: return None
+  if info == None: return 1
+
+  try:
+    response = requests.get(info[mode]["url"])
+  except Exception as err:
+    print("Error:\ndownload_jar(): Download jar file\n{0}".format(err))
+    return 1
   
   try:
-    request = requests.get(info[mode]["url"])
+    d_path.write_bytes(response.content)
   except Exception as err:
-    print("Could not download jar file\n{0}".format(err))
-    return None
-
-  data = request.content
-  request.close()
-  return data
+    print("Error:\ndownload_jar(): Write jar file\n{0}".format(err))
+    return 1
+  
+  response.close()
+  return 0

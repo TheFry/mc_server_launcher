@@ -59,9 +59,7 @@ def sig_handler(signum: int, frame) -> int:
 # update_jar.py
 def setup_dir() -> int:
   p: Path = Path(PATH)
-  jar: bytes = None 
-  file = None
-
+  r_val: int = 0
   # Check for .mc_server_manager folder in home
   if not p.exists():
     print("Creating directory" + PATH)
@@ -76,12 +74,9 @@ def setup_dir() -> int:
   p = Path(PATH + "server.jar")
   if not p.exists():
     print("Downloading latest server.jar")
-    jar = download_jar(mode = S_TYPE)
-    file = open(str(p), "wb")
-    file.write(jar)
-    file.close()
-
-
+    r_val = download_jar(d_path = p, mode = S_TYPE)
+  return r_val
+    
 
 
 def main():
