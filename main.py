@@ -77,9 +77,9 @@ def setup_dir() -> int:
     print("Downloading latest server.jar")
     jar = download_jar(mode = S_TYPE)
     file = open(str(p), "wb")
-    file.write(jar.content)
-    jar.close()
+    file.write(jar)
     file.close()
+
 
 
 
