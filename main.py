@@ -44,12 +44,13 @@ def menu() -> int:
     
 
 # Handle ^C
-def sig_handler(signum, frame) -> int:
+def sig_handler(signum: int, frame) -> int:
   sigint = 2
   if signum == sigint:
-    print("\n", EXIT)
+    print("\n" + EXIT)
     exit(sigint)  
-  return 0
+  
+  print("Caught Signal: {0}".format(signum))
 
 
 # Check if install directory exists.
@@ -86,6 +87,7 @@ def setup_dir() -> int:
 def main():
   signal.signal(signal.SIGINT, sig_handler)
   setup_dir()
+  input()
 
 
 if __name__ == "__main__":
