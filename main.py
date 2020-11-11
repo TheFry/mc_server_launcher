@@ -6,9 +6,6 @@ import pprint
 from constants import *
 from update_jar import download_jar
 
-# from download import *
-
-
 def help():
   # to do
   print("help")
@@ -52,17 +49,6 @@ def sig_handler(signum, frame):
   if signum == sigint:
     print("\n", EXIT)
     exit(sigint)  
-
-
-# Download a minecraft server version.
-# Default is latest
-def download_server(path = PATH + JAR_NAME):
-  jar = download_jar(id, S_TYPE)
-  f = open(path, "wb")
-
-  f.write(jar.content)
-  jar.close()
-  f.close()
 
 
 # Check if install directory exists.
