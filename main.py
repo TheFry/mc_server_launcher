@@ -1,9 +1,15 @@
 import subprocess
 import signal
 import time
+import json
+import pprint
 from pathlib import Path
-from constants import *
+from const import *
+import utils
+import strs
 from update_jar import download_jar
+
+
 
 def help():
   # to do
@@ -27,63 +33,94 @@ def menu() -> int:
   index = 0
 
   subprocess.run(CLEAR_C)
-  while(userin != "exit"):
-    print(TITLE)
+  while True:
+    print(strs.TITLE)
     print("Options:", *OPTIONS, sep = OPTIONS_STYLE)
     userin = input(PROMPT)
-    if userin == "exit": exit(0)
+    if userin == EXIT: exit(0)
     for command in COMMANDS:
       index = command.index
       if userin == command:
         funcs[command]()
         continue
       elif index == num_commands:
-        print(userin + ":", BAD_C)
+        print(userin + ":", strs.E_BAD_C)
         subprocess.run(CLEAR_C)
   return 0
     
 
-# Handle ^C
-def sig_handler(signum: int, frame) -> int:
-  sigint = 2
-  if signum == sigint:
-    print("\n" + EXIT)
-    exit(sigint)  
+
+def chk_dir() -> int:
+  p: Path = None
+  userIn: str = "" 
+  settings: dict = utils.safe_json_loads(Path(SETTINGS_PATH))
+
+  if settings == None:
+    print(strs.E_SET_LOAD)
+    exit(1)
+  try:
+    p = Path(settings[K_DIR])
+  except KeyError as err:
+    print(strs.E_KEY.format(err, SETTINGS_PATH))
+  if p.exists():
+    return 0
   
-  print("Caught Signal: {0}".format(signum))
+  print(strs.NO_DIR.format(p))
+  while True:
+    userIn = str(input(strs.ENTER_DIR.format(DEFAULT_PATH)))
+    if(userIn == EXIT): return 1
+    if(userIn == NONE): userIn = DEFAULT_PATH
 
-
-# Check if install directory exists.
-# If it doesn't, create it and download the latest
-# server.jar from mojang. Uses functions from 
-# update_jar.py
-def setup_dir() -> int:
-  p: Path = Path(PATH)
-  r_val: int = 0
-  # Check for .mc_server_manager folder in home
-  if not p.exists():
-    print("Creating directory" + PATH)
+    p = Path(userIn).expanduser()
     try:
-      p.mkdir(exist_ok = True)
-    except Exception as err:
-      print("Could not create dir:", PATH)
-      print(err)
-      return(1)
+      p.mkdir()
+    except FileExistsError as err:
+      print(strs.E_DIR_EXISTS.format(err))
+      continue
+    except FileNotFoundError as err:
+      print(strs.E_MKDIR.format(err))
+      continue
+
+    settings[K_DIR] = str(p)
+    if utils.safe_json_dumps(Path(SETTINGS_PATH), settings):
+      return 1
+    break
+  return 0
+
+
+def chk_settings() -> int:
+  p: Path = Path(SETTINGS_PATH)
+  test_json: dict = None
+
+  if not p.exists(): 
+    print(strs.SET_NEXIST)
+  else:
+    test_json = utils.safe_json_loads(p)
+    if test_json != None:
+      try:
+        test_json[K_DIR]
+      except KeyError as err:
+        print(strs.E_KEY.format(err, p)) 
+        print(strs.E_SET_LOAD) 
+      else:
+        return 0
+
+  chk = utils.yes_no(strs.SET_GEN)
+  if chk == 1:
+    if utils.safe_json_dumps(p, INIT_SETTINGS):
+      print(strs.E_SET_INIT)
+      return 1
+  else:
+    print(strs.SET_EDIT)
+    return 1
   
-  # Check that server jar is in .mc_server_manager 
-  p = Path(PATH + "server.jar")
-  if not p.exists():
-    print("Downloading latest server.jar")
-    r_val = download_jar(d_path = p, mode = S_TYPE)
-  return r_val
-    
 
-
-def main():
-  signal.signal(signal.SIGINT, sig_handler)
-  setup_dir()
-  input()
-
-
+def main() -> int:
+  signal.signal(signal.SIGINT, utils.sig_handler)
+  if chk_settings(): return 1
+  if chk_dir(): return 1
+  if menu(): return 1
+  return 0
+  
 if __name__ == "__main__":
   main()

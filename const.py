@@ -1,11 +1,11 @@
 from pathlib import Path
-
-VERSION = "1.0"
+VERSION = "0.1"
 TITLE = "Minecraft Server Manager " + VERSION
-
-DIR = ".mc_server_launcher/"
-PATH = "{0}/{1}".format(str(Path.home()), DIR)
-
+DEFAULT_PATH = "{0}/.mc_servers/".format(Path.home())
+SETTINGS_PATH = "./settings.json"
+PROMPT = "> "
+NONE = ""
+EXIT = "exit"
 
 OPTIONS = ["launch: Start a server",
            "kill: Stop a server",
@@ -13,12 +13,10 @@ OPTIONS = ["launch: Start a server",
            "exit: Close this manager. Server will continue to run."
           ]
 OPTIONS_STYLE = "\n   "
-PROMPT = "> "
 
 COMMANDS = ["launch", "kill", "help"]
-EXIT = "Exiting server manager"
-BAD_C = "Command not found"
 CLEAR_C = "clear"
+
 MEM = "2G"
 LAUNCH_C = ["java",
             "-Xms" + MEM,
@@ -26,7 +24,15 @@ LAUNCH_C = ["java",
             "-jar", "server.jar"
            ]
 
-
 JAR_NAME = "server.jar"
 S_TYPE = "server"
 C_TYPE = "client"
+
+# Settings keys
+K_DIR = "dir"
+K_JAR = "jar_name"
+K_VERSION = "version"
+K_MAIN = "main"
+
+INIT_SETTINGS = {K_DIR: DEFAULT_PATH, K_VERSION: VERSION}
+JSON_INDENT = 4

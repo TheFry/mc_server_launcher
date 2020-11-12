@@ -7,7 +7,7 @@
 import requests
 import json
 import pprint
-from constants import PATH, S_TYPE, C_TYPE
+from const import DEFAULT_PATH, S_TYPE, C_TYPE
 
 VERSIONS_URL = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
 
@@ -69,7 +69,7 @@ def get_download_info(build: dict) -> dict:
 # Runs through all of the above functions to download a jar file.
 # Version and type (server/client) can be specified. Use this if you
 # want to just download a jar and don't care about the json data.
-def download_jar(d_path: PATH, id: str = "latest", mode: str = S_TYPE) -> int:
+def download_jar(d_path: DEFAULT_PATH, id: str = "latest", mode: str = S_TYPE) -> int:
   info: dict = None
   response: requests.models.Response = None
   
