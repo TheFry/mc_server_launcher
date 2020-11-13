@@ -7,8 +7,7 @@ from pathlib import Path
 from const import *
 import utils
 import strs
-from update_jar import download_jar
-
+from jmgr import JarManager
 
 
 def help():
@@ -49,8 +48,7 @@ def menu() -> int:
   return 0
     
 
-
-def chk_dir() -> int:
+def chk_dir() -> Path:
   p: Path = None
   userIn: str = "" 
   settings: dict = utils.safe_json_loads(Path(SETTINGS_PATH))
@@ -63,7 +61,7 @@ def chk_dir() -> int:
   except KeyError as err:
     print(strs.E_KEY.format(err, SETTINGS_PATH))
   if p.exists():
-    return 0
+    return p
   
   print(strs.NO_DIR.format(p))
   while True:
@@ -83,9 +81,9 @@ def chk_dir() -> int:
 
     settings[K_DIR] = str(p)
     if utils.safe_json_dumps(Path(SETTINGS_PATH), settings):
-      return 1
+      return None
     break
-  return 0
+  return p
 
 
 def chk_settings() -> int:
@@ -118,7 +116,8 @@ def chk_settings() -> int:
 def main() -> int:
   signal.signal(signal.SIGINT, utils.sig_handler)
   if chk_settings(): return 1
-  if chk_dir(): return 1
+  p = chk_dir() 
+  if p == None: return 1
   if menu(): return 1
   return 0
   
