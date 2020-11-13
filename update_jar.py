@@ -6,87 +6,119 @@
 # either a server or client jar file.
 import requests
 import json
-import pprint
-from const import DEFAULT_PATH, S_TYPE, C_TYPE
+from pathlib import Path
 
 VERSIONS_URL = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
+class JarManager:
+  # Json keys
+  k_versions = "versions"
+  k_release = "release"
+  k_url = "url"
+  k_latest = "latest"
+  k_server = "server"
+  k_client = "client"
+
+  # Download a jar file with download_info 
+  def __download_jar(self, p: Path, download_info: dict, mode: str) -> int:
+    response: requests.models.Response = None
+
+    try:
+      response = requests.get(download_info[mode][self.k_url])
+    except (ConnectionError, TimeoutError) as err:
+      print("download_file() Network Error: {0}".format(err))
+      return 1
+    except KeyError as err:
+      print("download_file() Key Error: {0}".format(err))
+      return 1
+    
+    try:
+      p.write_bytes(response.content)
+    except Exception as err:
+      print("download_file() write error: {0}".format(err))
+      response.close()
+      return 1
+    response.close()
+    return 0
 
 
-# Downloads a json file from mojang, which
-# contains a list of builds.
-def get_builds() -> dict:
-  builds: dict = None
-  # Download json file with list of all versions
-  try:
-    builds = json.loads(requests.get(VERSIONS_URL).text)
-  except Exception as err:
-    print("get_builds()\n{0}".format(err))
-    exit(1)
-  return builds
+  # Gets download info. Includes a link to the jar, hashes, and other info
+  def __get_download_info(self, build: dict) -> dict:
+    download_info: dict = None
+    url: str = build["url"]
+
+    try:
+      download_info = json.loads(requests.get(url).text)["downloads"]
+    except Exception as err:
+      print("get_download_info() {0}".format(err))
+      return None
+
+    return download_info
 
 
-# Use the return value of get_builds() and
-# a string build id (ex: "1.16.4") to download a json file 
-# for that specific build. Defaults to the latest build.
-def get_build_info(builds: dict, id: str = "latest") -> dict:
-  versions: dict = None
+  # Use the return value of get_builds() and
+  # a string build id (ex: "1.16.4") to download a json file 
+  # for that specific build. Defaults to the latest build.
+  def __get_build_info(self, builds: dict, id: str = k_latest) -> dict:
+    versions: dict = None
 
-  # Set id and versions
-  try: 
-    if id == "latest": id = builds["latest"]["release"]
-    versions = builds["versions"]
-    # The next two lines check that the json format hasn't changed
-    versions[0]["id"]
-    versions[0]["url"]
-  except Exception as err:
-    print("get_build_info() id = {0} \n{1}".format(id, err))
+    # Set id and versions
+    try: 
+      if id == "latest": id = builds["latest"]["release"]
+      versions = builds["versions"]
+      # The next two lines check that the json format hasn't changed
+      versions[0]["id"]
+      versions[0]["url"]
+    except Exception as err:
+      print("get_build_info() id = {0} \n{1}".format(id, err))
+      return None
+    
+    # Try to find the given version from the list
+    for version in builds["versions"]:
+      if version["id"] == id:
+        return version
+
+    print("get_build_info()\nCouldn't find {0}".format(id))
+    print("Check the name")
     return None
-  
-  # Try to find the given version from the list
-  for version in builds["versions"]:
-    if version["id"] == id:
-      return version
-
-  print("get_build_info()\nCouldn't find {0}".format(id))
-  print("Check the name")
-  return None
 
 
-# Gets download info. Includes a link to the jar, hashes, and other info
-def get_download_info(build: dict) -> dict:
-  download_info: dict = None
-  url: str = build["url"]
+  # Downloads a json file from mojang, which
+  # contains a list of builds.
+  def __get_builds(self) -> dict:
+    builds: dict = None
+    # Download json file with list of all versions
+    try:
+      builds = json.loads(requests.get(VERSIONS_URL).text)
+    except (ConnectionError, TimeoutError) as err:
+      print("get_builds() Network Error: {0}".format(err))
+      return None
+    except KeyError as err:
+      print("get_builds() Key Error: {0}".format(err))
+      return None
+    return builds
 
-  try:
-    download_info = json.loads(requests.get(url).text)["downloads"]
-  except Exception as err:
-    print("get_download_info() {0}".format(err))
-    return None
 
-  return download_info
+  # Runs through all of the above functions to download a jar file.
+  # Version and type (server/client) can be specified. Use this if you
+  # want to just download a jar and don't care about the json data.
+  def get_jar(self, d_path: Path, id: str = k_latest, mode: str = k_server) -> int:
+    builds: dict = None
+    build_info: dict = None
+    download_info: dict = None
 
-
-# Runs through all of the above functions to download a jar file.
-# Version and type (server/client) can be specified. Use this if you
-# want to just download a jar and don't care about the json data.
-def download_jar(d_path: DEFAULT_PATH, id: str = "latest", mode: str = S_TYPE) -> int:
-  info: dict = None
-  response: requests.models.Response = None
-  
-  info = get_download_info(get_build_info(get_builds(), id))
-  if info == None: return 1
-
-  try:
-    response = requests.get(info[mode]["url"])
-  except Exception as err:
-    print("Error:\ndownload_jar(): Download jar file\n{0}".format(err))
-    return 1
-  
-  try:
-    d_path.write_bytes(response.content)
-  except Exception as err:
-    print("Error:\ndownload_jar(): Write jar file\n{0}".format(err))
-    return 1
-  
-  response.close()
-  return 0
+    builds = self.__get_builds()
+    if builds is None: 
+      print("Could not download jar\n")
+      return 1
+    build_info = self.__get_build_info(builds, id)
+    if build_info is None:
+      print("Could not download jar\n")
+      return 1
+    download_info = self.__get_download_info(build_info)
+    if download_info is None:
+      print("Could not download jar\n")
+      return 1
+    if self.__download_jar(d_path, download_info, mode):
+      print("Could not download jar\n")
+      return 1
+    return 0
