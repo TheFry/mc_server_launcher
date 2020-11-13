@@ -17,6 +17,7 @@ class JarManager:
   k_latest = "latest"
   k_server = "server"
   k_client = "client"
+  default_path = "./server.jar"
 
   # Download a jar file with download_info 
   def __download_jar(self, p: Path, download_info: dict, mode: str) -> int:
@@ -44,14 +45,14 @@ class JarManager:
   # Gets download info. Includes a link to the jar, hashes, and other info
   def __get_download_info(self, build: dict) -> dict:
     download_info: dict = None
-    url: str = build["url"]
-
+    url: str = ""
+    
+    url = build[self.k_url]
     try:
       download_info = json.loads(requests.get(url).text)["downloads"]
     except Exception as err:
       print("get_download_info() {0}".format(err))
       return None
-
     return download_info
 
 
@@ -86,6 +87,7 @@ class JarManager:
   # contains a list of builds.
   def __get_builds(self) -> dict:
     builds: dict = None
+
     # Download json file with list of all versions
     try:
       builds = json.loads(requests.get(VERSIONS_URL).text)
@@ -98,10 +100,25 @@ class JarManager:
     return builds
 
 
+  def get_latest_id(self) -> str:
+    build_id: str = ""
+    builds: dict = None
+    
+    builds = self.__get_builds()
+    if builds is None: return None
+    try:
+      build_id = builds[self.k_latest][self.k_release]
+    except KeyError as err:
+      print("get_latest_id(): {0}".format(err))
+      return None
+    return build_id
+
+    
   # Runs through all of the above functions to download a jar file.
   # Version and type (server/client) can be specified. Use this if you
   # want to just download a jar and don't care about the json data.
-  def get_jar(self, d_path: Path, id: str = k_latest, mode: str = k_server) -> int:
+  def get_jar(self, d_path: Path = default_path,
+              id: str = k_latest, mode: str = k_server) -> int:
     builds: dict = None
     build_info: dict = None
     download_info: dict = None
