@@ -25,14 +25,10 @@ LAUNCH_C = ["java",
            ]
 
 JAR_NAME = "server.jar"
-S_TYPE = "server"
-C_TYPE = "client"
 
 # Settings keys
 K_DIR = "dir"
-K_JAR = "jar_name"
 K_VERSION = "version"
-K_MAIN = "main"
 
 INIT_SETTINGS = {K_DIR: DEFAULT_PATH, K_VERSION: VERSION}
 JSON_INDENT = 4
