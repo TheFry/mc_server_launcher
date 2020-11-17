@@ -94,14 +94,15 @@ def chk_settings() -> Path:
     print(strs.SET_EDIT)
     return None
   return Path(DEFAULT_PATH)
-  
+
 
 def main() -> int:
   signal.signal(signal.SIGINT, utils.sig_handler)
   p = chk_settings()
   if p is None: return 1
-  if chk_dir(p): return 1
-  # if menu(): return 1
+  p = chk_dir(p)
+  if p is None: return 1
+  if menu(): return 1
   return 0
   
 if __name__ == "__main__":
