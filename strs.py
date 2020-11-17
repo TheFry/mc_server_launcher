@@ -8,7 +8,8 @@ SET_NEXIST = ("settings.json not found at {0}".format(const.SETTINGS_PATH))
 
 ENTER_DIR = ("Enter a new install directory (default is {0}):\n")
 NO_DIR = ("Looks like {0} doesn't exist.")
-
+LATEST_INSTALLED = (("Latest version {0} already installed"))
+DOWNLOAD_JAR = ("Downloading server version {0}")
 # Error messages
 E_KEY = "Key Error: {0} in {1}"
 E_SET_INIT = ("Couldn't create settings.json\nYou can try creating "

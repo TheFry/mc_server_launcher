@@ -62,10 +62,10 @@ def chk_server(p: Path) -> int:
   latest = latest + mgr.extension
   for entry in jar_path.iterdir():
     if entry.name == latest:
-      print("Latest jar already installed")
+      print(strs.LATEST_INSTALLED.format(entry.name))
       return 0
 
-  print("Downloading new server version {0}".format(latest))
+  print(strs.DOWNLOAD_JAR.format(latest))
   if mgr.get_jar(str(jar_path)): return 1
   return 0
   
