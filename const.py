@@ -2,7 +2,14 @@ from pathlib import Path
 VERSION = "0.1"
 TITLE = "Minecraft Server Manager " + VERSION
 DEFAULT_PATH = "{0}/.mc_servers/".format(Path.home())
+
+# Relative to main.py path
 SETTINGS_PATH = "./settings.json"
+
+# root = the user defined install directory
+SERVER_DIR = "/servers/"
+JAR_DIR = "/jars/"
+
 PROMPT = "> "
 NONE = ""
 EXIT = "exit"
@@ -12,6 +19,7 @@ OPTIONS = ["launch: Start a server",
            "help: More info about this program",
            "exit: Close this manager. Server will continue to run."
           ]
+
 OPTIONS_STYLE = "\n   "
 
 COMMANDS = ["launch", "kill", "help"]
