@@ -32,8 +32,9 @@ def safe_mkdir(p: Path) -> int:
   return 0
   
 
-def safe_json_update(p: Path, updates: dict) -> int:
+def safe_json_update(p: Path, updates: dict) -> dict:
   current: dict = safe_json_loads(p)
+
   if current is None:
     print("merge_dictionary() error")
     return 1
@@ -49,7 +50,6 @@ def safe_json_update(p: Path, updates: dict) -> int:
     return 1
   return 0
   
-
   
 def safe_json_dumps(p: Path, d: dict) -> int:
   json_indent = 4
