@@ -48,77 +48,60 @@ def menu() -> int:
   return 0
     
 
-def chk_dir() -> Path:
-  p: Path = None
+def chk_dir(p: Path) -> Path:
   userIn: str = "" 
-  settings: dict = utils.safe_json_loads(Path(SETTINGS_PATH))
 
-  if settings == None:
-    print(strs.E_SET_LOAD)
-    exit(1)
-  try:
-    p = Path(settings[K_DIR])
-  except KeyError as err:
-    print(strs.E_KEY.format(err, SETTINGS_PATH))
   if p.exists():
     return p
-  
-  print(strs.NO_DIR.format(p))
   while True:
     userIn = str(input(strs.ENTER_DIR.format(DEFAULT_PATH)))
-    if(userIn == EXIT): return 1
+    if(userIn == EXIT): return None
     if(userIn == NONE): userIn = DEFAULT_PATH
 
     p = Path(userIn).expanduser()
-    try:
-      p.mkdir()
-    except FileExistsError as err:
-      print(strs.E_DIR_EXISTS.format(err))
+    if utils.safe_mkdir(p):
+      print(strs.E_MKDIR.format(str(p)))
       continue
-    except FileNotFoundError as err:
-      print(strs.E_MKDIR.format(err))
-      continue
-
-    settings[K_DIR] = str(p)
-    if utils.safe_json_dumps(Path(SETTINGS_PATH), settings):
-      return None
     break
+    
+  if utils.safe_json_update(Path(SETTINGS_PATH), {K_DIR: str(p)}):
+    print(strs.E_SET_INIT)
+    return None
   return p
 
 
-def chk_settings() -> int:
+def chk_settings() -> Path:
   p: Path = Path(SETTINGS_PATH)
-  test_json: dict = None
-
   if not p.exists(): 
     print(strs.SET_NEXIST)
   else:
-    test_json = utils.safe_json_loads(p)
-    if test_json != None:
+    SETTINGS = utils.safe_json_loads(p)
+    if SETTINGS != None:
       try:
-        test_json[K_DIR]
+        p = Path(SETTINGS[K_DIR])
       except KeyError as err:
         print(strs.E_KEY.format(err, p)) 
         print(strs.E_SET_LOAD) 
       else:
-        return 0
+        return p
 
   chk = utils.yes_no(strs.SET_GEN)
   if chk == 1:
     if utils.safe_json_dumps(p, INIT_SETTINGS):
       print(strs.E_SET_INIT)
-      return 1
+      return None
   else:
     print(strs.SET_EDIT)
-    return 1
+    return None
+  return Path(DEFAULT_PATH)
   
 
 def main() -> int:
   signal.signal(signal.SIGINT, utils.sig_handler)
-  if chk_settings(): return 1
-  p = chk_dir() 
-  if p == None: return 1
-  if menu(): return 1
+  p = chk_settings()
+  if p is None: return 1
+  if chk_dir(p): return 1
+  # if menu(): return 1
   return 0
   
 if __name__ == "__main__":
