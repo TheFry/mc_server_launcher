@@ -10,6 +10,7 @@ from pathlib import Path
 
 VERSIONS_URL = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
 class JarManager:
+  extension = ".jar"
   # Json keys
   k_versions = "versions"
   k_release = "release"
@@ -17,12 +18,12 @@ class JarManager:
   k_latest = "latest"
   k_server = "server"
   k_client = "client"
-  default_path = "./server.jar"
+  default_path = "."
 
   # Download a jar file with download_info 
   def __download_jar(self, p: Path, download_info: dict, mode: str) -> int:
     response: requests.models.Response = None
-
+    
     try:
       response = requests.get(download_info[mode][self.k_url])
     except (ConnectionError, TimeoutError) as err:
@@ -31,7 +32,7 @@ class JarManager:
     except KeyError as err:
       print("download_file() Key Error: {0}".format(err))
       return 1
-    
+
     try:
       p.write_bytes(response.content)
     except Exception as err:
@@ -117,12 +118,14 @@ class JarManager:
   # Runs through all of the above functions to download a jar file.
   # Version and type (server/client) can be specified. Use this if you
   # want to just download a jar and don't care about the json data.
-  def get_jar(self, d_path: Path = default_path,
+  def get_jar(self, d_path: str = default_path,
               id: str = k_latest, mode: str = k_server) -> int:
     builds: dict = None
     build_info: dict = None
     download_info: dict = None
 
+    if id is self.k_latest: id = self.get_latest_id()
+    d_path = Path(d_path + "/{0}{1}".format(id, self.extension))
     builds = self.__get_builds()
     if builds is None: 
       print("Could not download jar\n")
