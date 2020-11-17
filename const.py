@@ -1,14 +1,14 @@
 from pathlib import Path
 VERSION = "0.1"
 TITLE = "Minecraft Server Manager " + VERSION
-DEFAULT_PATH = "{0}/.mc_servers/".format(Path.home())
+DEFAULT_PATH = "{0}/.mc_servers".format(Path.home())
 
 # Relative to main.py path
 SETTINGS_PATH = "./settings.json"
 
 # root = the user defined install directory
-SERVER_DIR = "/servers/"
-JAR_DIR = "/jars/"
+SERVER_DIR = "/servers"
+JAR_DIR = "/jars"
 
 PROMPT = "> "
 NONE = ""

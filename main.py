@@ -18,21 +18,23 @@ def kill():
   # to do
   print("kill")
 
-def launch():
-  # to do
-  subprocess.run(["ls", "-1"])
+def launch(p: Path):
+  
+  print(p)
   input()
+  # to do
+  
 
 # Prints a main menu and launches functions associated
 # with the commands that a user enters.
-def menu() -> int:
+def menu(p: Path) -> int:
   userin = ""
   num_commands = len(COMMANDS) - 1
   funcs = globals()
   index = 0
 
-  subprocess.run(CLEAR_C)
   while True:
+    subprocess.run(CLEAR_C)
     print(strs.TITLE)
     print("Options:", *OPTIONS, sep = OPTIONS_STYLE)
     userin = input(PROMPT)
@@ -40,13 +42,33 @@ def menu() -> int:
     for command in COMMANDS:
       index = command.index
       if userin == command:
-        funcs[command]()
+        funcs[command](p)
         continue
       elif index == num_commands:
         print(userin + ":", strs.E_BAD_C)
-        subprocess.run(CLEAR_C)
   return 0
     
+
+def chk_server(p: Path) -> int:
+  jar_path = Path(str(p) + JAR_DIR)
+  servers_path = Path(str(p) + SERVER_DIR)
+  mgr = JarManager()
+  latest: str = ""
+
+  if not servers_path.exists() and utils.safe_mkdir(servers_path): return 2
+  if not jar_path.exists() and utils.safe_mkdir(jar_path): return 2
+  latest = mgr.get_latest_id()
+  if latest is None: return 1
+  latest = latest + mgr.extension
+  for entry in jar_path.iterdir():
+    if entry.name == latest:
+      print("Latest jar already installed")
+      return 0
+
+  print("Downloading new server version {0}".format(latest))
+  if mgr.get_jar(str(jar_path)): return 1
+  return 0
+  
 
 def chk_dir(p: Path) -> Path:
   userIn: str = "" 
@@ -102,7 +124,7 @@ def main() -> int:
   if p is None: return 1
   p = chk_dir(p)
   if p is None: return 1
-  if menu(): return 1
+  if chk_server(p) == 2: return 1
   return 0
   
 if __name__ == "__main__":
