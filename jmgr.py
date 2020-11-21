@@ -101,6 +101,19 @@ class JarManager:
     return builds
 
 
+  def build_exists(self, build_id: str) -> bool:
+    builds: dict = self.__get_builds()
+    
+    if builds is None: return False
+    try:
+      for build in builds["versions"]:
+        if build["id"] == build_id: return True
+    except KeyError as err:
+      print("build_exists() KeyError: {0}".format(err))
+      return False
+    return False
+
+
   def get_latest_id(self) -> str:
     build_id: str = ""
     builds: dict = None
@@ -118,14 +131,14 @@ class JarManager:
   # Runs through all of the above functions to download a jar file.
   # Version and type (server/client) can be specified. Use this if you
   # want to just download a jar and don't care about the json data.
-  def get_jar(self, d_path: str = default_path,
+  def get_jar(self, d_path: Path = Path(default_path),
               id: str = k_latest, mode: str = k_server) -> str:
     builds: dict = None
     build_info: dict = None
     download_info: dict = None
 
     if id is self.k_latest: id = self.get_latest_id()
-    d_path = Path(d_path + "/{0}{1}".format(id, self.extension))
+    d_path = Path("{0}/{1}{2}".format(d_path, id, self.extension))
     builds = self.__get_builds()
     if builds is None: 
       print("Could not download jar\n")

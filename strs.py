@@ -13,6 +13,7 @@ LATEST_INSTALLED = (("Latest version {0} already installed"))
 DOWNLOAD_JAR = ("Downloading server version {0}")
 NEW_SRV_NAME = ("Enter a name for your new sever: ")
 NEW_SRV_VER = ("Enter a server version to use (default is latest): ")
+INIT_PROP = ("Initializing server.properties")
 
 # Error messages
 E_KEY = "Key Error: {0} in {1}"
@@ -29,3 +30,9 @@ E_NAME_SLASH = ("Server names cannot contain /")
 E_PATH_EXISTS = ("Path: {0} already exists")
 E_SRV_EXISTS = ("Server {0} already exists")
 E_WRITE_TEXT = ("Could not write to {0}")
+E_EULA = ("Could not create eula.txt")
+E_NOMEM = ("Not enough free memory")
+E_INT = ("Not a valid integer")
+
+Q_MEM = ("How much memory for the server (in GiB): ")
+Q_MEM_CONF = ("Is {0} GiB ok? ")

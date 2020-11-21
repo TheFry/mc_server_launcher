@@ -2,10 +2,6 @@ from pathlib import Path
 import json
 
 
-# def list_options(options: list, pretext: str, postText: str) -> str:
-#   response: str = ""
-
-#   while response
 
 
 def yes_no(question: str = "") -> int:
@@ -20,12 +16,14 @@ def yes_no(question: str = "") -> int:
     else: print("Invalid response")
   return -1
 
-def check_directory(p: Path, file: str) -> int:
-  if not p.exists() or not p.is_dir(): return 2
+
+def is_in_dir(p: Path, file: str) -> bool:
+  if not p.exists() or not p.is_dir(): None
   for entry in p.iterdir():
-    if str(entry) == str(file): return 0
-  return 1
+    if str(entry) == str(file): return True
+  return False
   
+
 def safe_symlink(target: Path, lpath: Path, overwrite: bool = False) -> int:
   if lpath.exists() and overwrite is False:
     print("Symlink Error: "
@@ -42,6 +40,7 @@ def safe_symlink(target: Path, lpath: Path, overwrite: bool = False) -> int:
     print("Symlink Error: {0}".format(err))
     return 1
   return 0
+
 
 def safe_mkdir(p: Path) -> int:
   try:
