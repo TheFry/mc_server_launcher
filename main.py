@@ -94,6 +94,7 @@ def mk_srv_version(server_path: Path, jars_path: Path) -> int:
         break
       else:
         print("Couldn't find {0}".format(userin))
+    else: break
 
   if utils.safe_symlink(jar_path, link_path): 
     input()
@@ -109,6 +110,7 @@ def mk_srv_dir(servers_path: Path) -> Path:
   while userin != EXIT:
     userin = str(input(strs.NEW_SRV_NAME))
     if userin == EXIT: return None
+    if userin == NONE: continue
     try: userin.index("/")
     except: pass
     else:
