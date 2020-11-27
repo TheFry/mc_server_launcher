@@ -16,7 +16,8 @@ from init import chk_settings, chk_dir, chk_servers
 def mk_launch_cmd(mem: int = None, init: bool = False) -> str:
   GiB = pow(1024, 3)
   free_mem = virtual_memory().available / GiB
-  cmd: list = []
+  cmd: str = ""
+  o_init = " --initSettings"
   
   if mem is None:
     while mem != EXIT:
@@ -38,8 +39,8 @@ def mk_launch_cmd(mem: int = None, init: bool = False) -> str:
     return None
   if mem == EXIT: return None
 
-  cmd = LAUNCH_C.format(mem, JAR_NAME).split(" ")
-  if init is True: cmd.append("--init")
+  cmd = LAUNCH_C.format(mem, JAR_NAME)
+  if init is True: cmd = cmd + o_init
   return cmd
 
 
@@ -75,6 +76,7 @@ def mk_srv_version(server_path: Path, jars_path: Path) -> int:
   mgr = JarManager()
   link_path = Path("{0}/{1}".format(str(server_path), "server.jar"))
   userin: str = NONE
+  tf = False
 
   while userin != EXIT:
     userin = str(input(strs.NEW_SRV_VER))
@@ -87,13 +89,18 @@ def mk_srv_version(server_path: Path, jars_path: Path) -> int:
       continue
     filename = "{0}{1}".format(userin, JarManager.extension)
     jar_path = Path("{0}/{1}".format(jars_path, filename))
-    if not utils.is_in_dir(jars_path, jar_path):
-      print("Looking online for version {0}".format(userin))
+    tf = utils.is_in_dir(jars_path, jar_path)
+    if tf is False:
+      print(strs.LOOK_SERVER.format(userin))
       if mgr.build_exists(userin):
-        mgr.get_jar(jars_path, userin)
+        print(strs.DOWNLOAD_JAR.format(userin))
+        if mgr.get_jar(jars_path, userin) is None: continue
         break
       else:
         print("Couldn't find {0}".format(userin))
+        continue
+    elif tf is None:
+      return 1
     else: break
 
   if utils.safe_symlink(jar_path, link_path): 
@@ -122,7 +129,10 @@ def mk_srv_dir(servers_path: Path) -> Path:
       print(strs.E_SRV_EXISTS.format(userin))
       continue
     server_path = Path("{0}/{1}".format(str(servers_path), userin))
-    if utils.safe_mkdir(server_path): continue
+    if utils.safe_mkdir(server_path): 
+      try: server_path.rmdir()
+      except: pass
+      continue
     break
   return server_path
   
@@ -136,17 +146,25 @@ def create(p: Path) -> int:
   if not servers_path.exists() and utils.safe_mkdir(servers_path):
     input()
     return 1
+  if not jars_path.exists() and utils.safe_mkdir(jars_path):
+    input()
+    return 1
 
   server_path = mk_srv_dir(servers_path)
   if server_path is None:
     input()
     return 1
 
-  if mk_srv_version(server_path, jars_path): return 1
+  if mk_srv_version(server_path, jars_path): 
+    print(strs.E_MAKE_SERVER.format(server_path))
+    input()
+    return 1
   if check_eula(Path("{0}{1}".format(server_path, EULA_NAME))): return 1
+
   cmd = mk_launch_cmd(init = True)
+  print(strs.INIT_PROP)
   if cmd is None: return 1
-  try: subprocess.run(cmd, check = True, cwd = server_path)
+  try: subprocess.run(cmd.split(" "), check = True, cwd = server_path)
   except subprocess.CalledProcessError as err:
     print(err)
     input()
@@ -183,9 +201,6 @@ def menu(p: Path) -> int:
         print(userin + ":", strs.E_BAD_C)
   return 0
   
-
-
-
 
 def main() -> int:
   signal.signal(signal.SIGINT, utils.sig_handler)

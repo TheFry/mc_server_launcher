@@ -14,6 +14,7 @@ DOWNLOAD_JAR = ("Downloading server version {0}")
 NEW_SRV_NAME = ("Enter a name for your new sever: ")
 NEW_SRV_VER = ("Enter a server version to use (default is latest): ")
 INIT_PROP = ("Initializing server.properties")
+LOOK_SERVER = ("Looking online for version {0}")
 
 # Error messages
 E_KEY = "Key Error: {0} in {1}"
@@ -25,7 +26,7 @@ E_BAD_C = ("{0}: Invalid command")
 E_DIR_EXISTS = ("Directory already exists: {0}")
 E_MKDIR = ("Could not create directory: {0}")
 E_JSON_UPDATE = ("Could not update {0}")
-E_MAKE_SERVER = ("Could not create {0}")
+E_MAKE_SERVER = ("Could not create server: {0}")
 E_NAME_SLASH = ("Server names cannot contain /")
 E_PATH_EXISTS = ("Path: {0} already exists")
 E_SRV_EXISTS = ("Server {0} already exists")
