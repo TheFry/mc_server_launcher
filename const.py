@@ -30,7 +30,7 @@ OPTIONS_STYLE = "\n   "
 COMMANDS = ["launch", "kill", "create", "help"]
 CLEAR_C = "clear"
 
-LAUNCH_C = "java -Xms{0}G -Xmx{0}G -jar {1}"
+LAUNCH_C = "java -Xms{0}G -Xmx{0}G -jar {1} --nogui"
 JAR_NAME = "server.jar"
 
 # Settings keys
