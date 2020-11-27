@@ -2,8 +2,6 @@ from pathlib import Path
 import json
 
 
-
-
 def yes_no(question: str = "") -> int:
   # 0 = yes, 1 = no, -1 = exit
   response: str = ""
@@ -18,10 +16,30 @@ def yes_no(question: str = "") -> int:
 
 
 def is_in_dir(p: Path, file: str) -> bool:
-  if not p.exists() or not p.is_dir(): None
+  if not p.exists() or not p.is_dir(): return None
   for entry in p.iterdir():
     if str(entry) == str(file): return True
   return False
+
+
+# Be careful with this
+def rmdir_recursive(p: Path) -> int:
+  if not p.exists() and not p.is_symlink():
+    print("{0} does not exist".format(p))
+    return 1
+  if p.is_dir():
+    for entry in p.iterdir():
+      rmdir_recursive(entry)
+    try: p.rmdir()
+    except Exception as err:
+      print("Could not remove {0}: {1}".format(p, err))
+  else:
+    try: p.unlink(missing_ok = True)
+    except Exception as err: 
+      print("Could not remove {0}: {1}".format(p, err))
+      return 1
+    else:
+      return 0
   
 
 def safe_symlink(target: Path, lpath: Path, overwrite: bool = False) -> int:
