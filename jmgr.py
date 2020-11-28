@@ -26,12 +26,13 @@ class JarManager:
     
     try:
       response = requests.get(download_info[mode][self.k_url])
-    except Exception as err:
-      print("download_file() Network Error: {0}".format(err))
-      return 1
     except KeyError as err:
       print("download_file() Key Error: {0}".format(err))
       return 1
+    except Exception as err:
+      print("download_file() Network Error: {0}".format(err))
+      return 1
+
 
     try:
       p.write_bytes(response.content)
@@ -92,12 +93,13 @@ class JarManager:
     # Download json file with list of all versions
     try:
       builds = json.loads(requests.get(VERSIONS_URL).text)
-    except Exception as err:
-      print("get_builds() Network Error: {0}".format(err))
-      return None
     except KeyError as err:
       print("get_builds() Key Error: {0}".format(err))
       return None
+    except Exception as err:
+      print("get_builds() Network Error: {0}".format(err))
+      return None
+
     return builds
 
 
