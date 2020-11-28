@@ -26,7 +26,7 @@ class JarManager:
     
     try:
       response = requests.get(download_info[mode][self.k_url])
-    except (ConnectionError, TimeoutError) as err:
+    except Exception as err:
       print("download_file() Network Error: {0}".format(err))
       return 1
     except KeyError as err:
@@ -92,7 +92,7 @@ class JarManager:
     # Download json file with list of all versions
     try:
       builds = json.loads(requests.get(VERSIONS_URL).text)
-    except (ConnectionError, TimeoutError) as err:
+    except Exception as err:
       print("get_builds() Network Error: {0}".format(err))
       return None
     except KeyError as err:
