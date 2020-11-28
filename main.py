@@ -164,7 +164,7 @@ def create(p: Path) -> int:
   cmd = mk_launch_cmd(init = True)
   print(strs.INIT_PROP)
   if cmd is None: return 1
-  try: subprocess.run(cmd.split(" "), check = True, cwd = server_path)
+  try: subprocess.run(cmd.split(" "), check = True, cwd = server_path, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL, input = "stop\n", text = True)
   except subprocess.CalledProcessError as err:
     print(err)
     input()
@@ -189,6 +189,7 @@ def menu(p: Path) -> int:
   while True:
     subprocess.run(CLEAR_C)
     print(strs.TITLE)
+    print(strs.ENT_EXIT)
     print("Options:", *OPTIONS, sep = OPTIONS_STYLE)
     userin = input(PROMPT)
     if userin == EXIT: exit(0)
@@ -208,7 +209,12 @@ def main() -> int:
   if p is None: return 1
   p = chk_dir(p)
   if p is None: return 1
-  if chk_servers(p) == 2: return 1
+  chk =  chk_servers(p)
+  if chk == 2: return 1
+  elif chk == 1:
+    print(strs.E_LATEST)
+    print(strs.ANY_CONTINUE)
+    input()
   if menu(p): return 1
   return 0
   
