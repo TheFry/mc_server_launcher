@@ -42,6 +42,15 @@ def rmdir_recursive(p: Path) -> int:
       return 0
   
 
+def safe_write_text(p: Path, text: str) -> int:
+  try:
+    p.write_text(str)
+  except Exception as err:
+    print("write_text: {0}".format(err))
+    return 1
+  return 0
+
+
 def safe_symlink(target: Path, lpath: Path, overwrite: bool = False) -> int:
   if lpath.exists() and overwrite is False:
     print("Symlink Error: "
