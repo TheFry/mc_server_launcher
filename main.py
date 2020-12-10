@@ -164,7 +164,10 @@ def create(p: Path) -> int:
   cmd = mk_launch_cmd(init = True)
   print(strs.INIT_PROP)
   if cmd is None: return 1
-  try: subprocess.run(cmd.split(" "), check = True, cwd = server_path, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL, input = "stop\n", text = True)
+  try: subprocess.run(cmd.split(" "), check = True,
+                      cwd = server_path, stdout = subprocess.DEVNULL,
+                      stderr = subprocess.DEVNULL, input = "stop\n", text = True
+                     )
   except subprocess.CalledProcessError as err:
     print(err)
     input()

@@ -39,7 +39,7 @@ def chk_servers(p: Path) -> int:
   if not jars_path.exists() and utils.safe_mkdir(jars_path): return 2
   if chk_latest(p): return 1
   return 0
-  
+   
 
 def chk_dir(p: Path) -> Path:
   userIn: str = "" 
