@@ -1,5 +1,5 @@
 from pathlib import Path
-from jmgr import JarManager
+from mcservers.jmgr import JarManager
 from const import JAR_DIR, LATEST_SLINK, SERVER_DIR, DEFAULT_PATH,SETTINGS_PATH, K_DIR, SETTINGS_PATH, EXIT, NONE, INIT_SETTINGS
 import strs
 import utils
