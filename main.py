@@ -9,7 +9,7 @@ from psutil import virtual_memory
 from const import *
 import utils
 import strs
-from jmgr import JarManager
+from mcservers.jmgr import JarManager
 from init import chk_settings, chk_dir, chk_servers
 
 

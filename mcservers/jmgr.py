@@ -134,13 +134,15 @@ class JarManager:
   # Version and type (server/client) can be specified. Use this if you
   # want to just download a jar and don't care about the json data.
   def get_jar(self, d_path: Path = Path(default_path),
-              id: str = k_latest, mode: str = k_server) -> str:
+              id: str = k_latest, mode: str = k_server,
+              fname = False) -> str:
     builds: dict = None
     build_info: dict = None
     download_info: dict = None
 
     if id is self.k_latest: id = self.get_latest_id()
-    d_path = Path("{0}/{1}{2}".format(d_path, id, self.extension))
+    if not fname: 
+      d_path = Path("{0}/{1}{2}".format(d_path, id, self.extension))
     builds = self.__get_builds()
     if builds is None: 
       print("Could not download jar\n")
